@@ -53,31 +53,27 @@ function renderLearn() {
   // 答え合わせロジック
   $("#check").onclick = () => {
     const ans = $("#answer").value.trim().toLowerCase();
-    // 複数の正解に対応（カンマ区切りでチェック）
     const ok = q.ja.toLowerCase().split(',').map(j => j.trim()).includes(ans);
     const resultText = ok ? "✅ 正解！" : `❌ 不正解。正解は「${q.ja}」です。`;
     
     $("#result").textContent = resultText;
     $("#result").classList.add(ok ? 'correct' : 'incorrect');
-    $("#result").classList.remove(ok ? 'incorrect' : 'correct'); // クラス切り替え
+    $("#result").classList.remove(ok ? 'incorrect' : 'correct');
 
-    // 例文の表示と自動読み上げ
     const exampleText = q.example || '例文が登録されていません。';
     $("#example").textContent = `例文: ${exampleText}`;
     
-    // UIの切り替え
     $("#check").style.display = 'none';
     $("#next").style.display = 'block';
 
     if (q.example) {
         $("#readExample").style.display = 'inline-block';
-        speak(q.example); // ★ 自動で読み上げる ★
+        speak(q.example); 
     }
   };
   
   // 読み上げボタンのイベント設定
   $("#readExample").onclick = () => {
-      // 例文がまだ表示されていない場合の対策も兼ねて、ここでテキストを取得
       if (q.example) {
           speak(q.example);
       }
@@ -88,7 +84,6 @@ function renderLearn() {
   // Enterキーで答え合わせができるように
   $("#answer").addEventListener('keypress', (e) => {
       if (e.key === 'Enter') {
-          // 答え合わせボタンが非表示でなければクリック
           if ($("#check").style.display !== 'none') {
              $("#check").click();
           }
