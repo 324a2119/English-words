@@ -1,9 +1,56 @@
-<style>
-/* ... (既存のスタイルはそのまま) ... */
-
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Bit英単語テスト</title>
+  <script src="app.js" defer></script>
+    <style>
+    :root {
+      --primary-color: #3f51b5; /* インディゴ */
+      --secondary-color: #ff9800; /* オレンジ */
+      --background-color: #f4f7f6; /* 薄いグレーの背景 */
+      --card-background: #ffffff;
+      --correct-color: #4caf50; /* 緑 */
+      --incorrect-color: #f44336; /* 赤 */
+      --text-color: #333;
+    }
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: var(--background-color);
+      color: var(--text-color);
+      margin: 0;
+      padding: 0;
+      text-align: center;
+    }
+    h1 {
+      background-color: var(--primary-color);
+      color: white;
+      padding: 20px 0;
+      margin: 0 0 20px 0;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      font-size: 1.8em;
+    }
+    nav {
+      margin-bottom: 30px;
+    }
+    .btn {
+      background-color: var(--primary-color);
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      margin: 5px;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+      font-size: 1em;
+    }
     .btn:hover {
       background-color: #303f9f;
     }
+    .primary-btn { background-color: var(--primary-color); }
+    .success-btn { background-color: var(--correct-color); }
+    .success-btn:hover { background-color: #388e3c; }
     .secondary-btn {
         background-color: var(--secondary-color);
         margin-left: 10px;
@@ -13,6 +60,52 @@
     .secondary-btn:hover {
         background-color: #f57c00;
     }
-    
-/* ... (その他のスタイルもそのまま) ... */
-</style>
+    .next-btn { 
+        background-color: var(--secondary-color); 
+        margin-top: 20px;
+        padding: 12px 25px;
+    }
+    .next-btn:hover { background-color: #f57c00; }
+
+    .card {
+      background-color: var(--card-background);
+      max-width: 600px;
+      margin: 0 auto;
+      padding: 30px;
+      border-radius: 10px;
+      box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+    }
+    .word-en {
+      font-size: 3em;
+      margin-bottom: 20px;
+      color: var(--primary-color);
+    }
+    .input-text {
+      padding: 10px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      margin-right: 10px;
+      width: 60%;
+      max-width: 300px;
+      font-size: 1em;
+      transition: border-color 0.3s;
+    }
+    .input-text:focus {
+      border-color: var(--secondary-color);
+      outline: none;
+    }
+    .answer-section {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        margin-bottom: 20px;
+    }
+    .result-area {
+        min-height: 80px; /* 結果表示エリアの確保 */
+    }
+    .result-message {
+      font-size: 1.2em;
+      font-weight: bold;
+      margin-top: 15px;
+    }
+    .correct { color: var(--correct-color
