@@ -1,4 +1,5 @@
 const KEY = "vocab_words_v1";
+// words.js のコードは app.js と同一のため、app.js のみ改修します。
 let words = JSON.parse(localStorage.getItem(KEY) || "[]");
 const $ = (s) => document.querySelector(s);
 const view = $("#view");
@@ -35,22 +36,19 @@ function renderLearn() {
     </div>
   `;
 
-  // 答え合わせロジック
+  // 答え合わせロジックの変更
   $("#check").onclick = () => {
     const ans = $("#answer").value.trim().toLowerCase();
-    // 複数の正解に対応（カンマ区切りでチェック）
-    const ok = q.ja.toLowerCase().split(',').map(j => j.trim()).includes(ans);
+    const ok = q.ja.toLowerCase().split(',').map(j => j.trim()).includes(ans);
     const resultText = ok ? "✅ 正解！" : `❌ 不正解。正解は「${q.ja}」です。`;
     
     $("#result").textContent = resultText;
     $("#result").classList.add(ok ? 'correct' : 'incorrect');
-    $("#result").classList.remove(ok ? 'incorrect' : 'correct');
 
-    // 例文を表示する機能は残します
-    const exampleText = q.example || '例文が登録されていません。';
-    $("#example").textContent = `例文: ${exampleText}`;
+    // 例文を表示
+    $("#example").textContent = `例文: ${q.example || '例文が登録されていません。'}`;
     
-    // UIの切り替え
+    // 答え合わせボタンを非表示にし、次の問題へボタンを表示
     $("#check").style.display = 'none';
     $("#next").style.display = 'block';
   };
@@ -60,10 +58,7 @@ function renderLearn() {
   // Enterキーで答え合わせができるように
   $("#answer").addEventListener('keypress', (e) => {
       if (e.key === 'Enter') {
-          // 答え合わせボタンが非表示でなければクリック
-          if ($("#check").style.display !== 'none') {
-             $("#check").click();
-          }
+          $("#check").click();
       }
   });
 }
@@ -96,6 +91,7 @@ function renderAdd() {
     </div>
   `;
   
+  // 例文入力フィールドを追加
   $("#add").onclick = () => {
     const en = $("#en").value.trim();
     const ja = $("#ja").value.trim();
