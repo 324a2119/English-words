@@ -1,15 +1,16 @@
 const KEY = "vocab_words_v1";
+// words.js のコードは app.js と同一のため、app.js のみ改修します。
 let words = JSON.parse(localStorage.getItem(KEY) || "[]");
 const $ = (s) => document.querySelector(s);
 const view = $("#view");
 
 // 初回ロード時
 if (words.length === 0) {
-  fetch("words.json")
-    .then(r => r.json())
-    .then(d => { words = d; save(); renderLearn(); });
+  fetch("words.json")
+    .then(r => r.json())
+    .then(d => { words = d; save(); renderLearn(); });
 } else {
-  renderLearn();
+  renderLearn();
 }
 function save() { localStorage.setItem(KEY, JSON.stringify(words)); }
 
@@ -18,35 +19,92 @@ $("#modeList").onclick = renderList;
 $("#modeAdd").onclick = renderAdd;
 
 function renderLearn() {
-  if (words.length === 0) return view.innerHTML = "<p>単語がありません</p>";
-  const q = words[Math.floor(Math.random() * words.length)];
-  view.innerHTML = `
-    <h2>${q.en}</h2>
-    <input id="answer" placeholder="答えは？" />
-    <button id="check">答え合わせ</button>
-    <p id="result"></p>
-  `;
-  $("#check").onclick = () => {
-    const ans = $("#answer").value.trim().toLowerCase();
-    const ok = ans === q.ja.toLowerCase();
-    $("#result").textContent = ok ? "✅ 正解" : `❌ 正解は ${q.ja}`;
-  };
+  if (words.length === 0) return view.innerHTML = "<p>単語がありません</p>";
+  const q = words[Math.floor(Math.random() * words.length)];
+  view.innerHTML = `
+    <div class="card">
+      <h2 class="word-en">${q.en}</h2>
+      <div class="answer-section">
+        <input id="answer" placeholder="答えは？" class="input-text" />
+        <button id="check" class="btn primary-btn">答え合わせ</button>
+      </div>
+      <div id="result-area" class="result-area">
+        <p id="result" class="result-message"></p>
+        <p id="example" class="example-text"></p>
+      </div>
+      <button id="next" class="btn next-btn" style="display: none;">次の問題へ</button>
+    </div>
+  `;
+
+  // 答え合わせロジックの変更
+  $("#check").onclick = () => {
+    const ans = $("#answer").value.trim().toLowerCase();
+    const ok = q.ja.toLowerCase().split(',').map(j => j.trim()).includes(ans);
+    const resultText = ok ? "✅ 正解！" : `❌ 不正解。正解は「${q.ja}」です。`;
+    
+    $("#result").textContent = resultText;
+    $("#result").classList.add(ok ? 'correct' : 'incorrect');
+
+    // 例文を表示
+    $("#example").textContent = `例文: ${q.example || '例文が登録されていません。'}`;
+    
+    // 答え合わせボタンを非表示にし、次の問題へボタンを表示
+    $("#check").style.display = 'none';
+    $("#next").style.display = 'block';
+  };
+  
+  $("#next").onclick = renderLearn;
+  
+  // Enterキーで答え合わせができるように
+  $("#answer").addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') {
+          $("#check").click();
+      }
+  });
 }
 
 function renderList() {
-  view.innerHTML = "<ul>" +
-    words.map(w => `<li>${w.en} - ${w.ja}</li>`).join("") +
-    "</ul>";
+  view.innerHTML = `
+    <div class="card list-view">
+      <h2>単語リスト</h2>
+      <ul class="word-list">
+      ${words.map(w => `
+        <li>
+          <span class="word-en-list">${w.en}</span> - 
+          <span class="word-ja-list">${w.ja}</span>
+          ${w.example ? `<span class="word-example-list">(${w.example})</span>` : ''}
+        </li>
+      `).join("")}
+      </ul>
+    </div>
+  `;
 }
 
 function renderAdd() {
-  view.innerHTML = `
-    <input id="en" placeholder="英語" />
-    <input id="ja" placeholder="日本語" />
-    <button id="add">追加</button>
-  `;
-  $("#add").onclick = () => {
-    words.push({ en: $("#en").value, ja: $("#ja").value });
-    save(); alert("追加しました"); renderList();
-  };
+  view.innerHTML = `
+    <div class="card add-form">
+      <h2>単語追加</h2>
+      <input id="en" placeholder="英語 (必須)" class="input-text" />
+      <input id="ja" placeholder="日本語 (必須)" class="input-text" />
+      <input id="example" placeholder="例文 (任意)" class="input-text" />
+      <button id="add" class="btn success-btn">リストに追加</button>
+    </div>
+  `;
+  
+  // 例文入力フィールドを追加
+  $("#add").onclick = () => {
+    const en = $("#en").value.trim();
+    const ja = $("#ja").value.trim();
+    const example = $("#example").value.trim();
+    
+    if (!en || !ja) {
+        alert("英語と日本語は必須です。");
+        return;
+    }
+    
+    words.push({ en: en, ja: ja, example: example });
+    save();
+    alert(`「${en}」を追加しました！`);
+    renderList();
+  };
 }
