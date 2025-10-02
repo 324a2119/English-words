@@ -51,15 +51,8 @@
     .primary-btn { background-color: var(--primary-color); }
     .success-btn { background-color: var(--correct-color); }
     .success-btn:hover { background-color: #388e3c; }
-    .secondary-btn {
-        background-color: var(--secondary-color);
-        margin-left: 10px;
-        padding: 8px 15px;
-        font-size: 0.9em;
-    }
-    .secondary-btn:hover {
-        background-color: #f57c00;
-    }
+    /* secondary-btn (音声ボタン) のスタイルを削除 */
+    
     .next-btn { 
         background-color: var(--secondary-color); 
         margin-top: 20px;
@@ -108,4 +101,42 @@
       font-weight: bold;
       margin-top: 15px;
     }
-    .correct { color: var(--correct-color
+    .correct { color: var(--correct-color); }
+    .incorrect { color: var(--incorrect-color); }
+    
+    .example-text {
+        font-style: italic;
+        color: #666;
+        margin-top: 10px;
+        border-top: 1px dashed #eee;
+        padding-top: 10px;
+    }
+    .add-form input {
+      display: block;
+      width: 80%;
+      margin: 10px auto;
+    }
+    .word-list {
+      list-style: none;
+      padding: 0;
+      text-align: left;
+    }
+    .word-list li {
+      padding: 10px;
+      border-bottom: 1px solid #eee;
+    }
+    .word-list li:last-child { border-bottom: none; }
+    .word-en-list { font-weight: bold; color: var(--primary-color); }
+    .word-example-list { font-size: 0.9em; color: #999; margin-left: 10px;}
+  </style>
+</head>
+<body>
+  <h1>Bit英単語テスト</h1>
+  <nav>
+    <button id="modeLearn" class="btn">🧠 学習</button>
+    <button id="modeList" class="btn">📝 リスト</button>
+    <button id="modeAdd" class="btn">➕ 追加</button>
+  </nav>
+  <main id="view"></main>
+</body>
+</html>
