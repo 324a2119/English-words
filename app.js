@@ -1,5 +1,4 @@
 const KEY = "vocab_words_v1";
-// words.js のコードは app.js と同一のため、app.js のみ改修します。
 let words = JSON.parse(localStorage.getItem(KEY) || "[]");
 const $ = (s) => document.querySelector(s);
 const view = $("#view");
@@ -18,47 +17,81 @@ $("#modeLearn").onclick = renderLearn;
 $("#modeList").onclick = renderList;
 $("#modeAdd").onclick = renderAdd;
 
+// --- 音声読み上げ関数 ---
+const speak = (text) => {
+    // ブラウザが音声合成APIをサポートしているか確認
+    if ('speechSynthesis' in window && text) {
+        window.speechSynthesis.cancel();
+        
+        const utterance = new SpeechSynthesisUtterance(text);
+        utterance.lang = 'en-US'; 
+        utterance.rate = 0.9; 
+        window.speechSynthesis.speak(utterance);
+    }
+};
+// -------------------------
+
 function renderLearn() {
   if (words.length === 0) return view.innerHTML = "<p>単語がありません</p>";
   const q = words[Math.floor(Math.random() * words.length)];
   view.innerHTML = `
     <div class="card">
-      <h2 class="word-en">${q.en}</h2>
-      <div class="answer-section">
-        <input id="answer" placeholder="答えは？" class="input-text" />
-        <button id="check" class="btn primary-btn">答え合わせ</button>
-      </div>
-      <div id="result-area" class="result-area">
-        <p id="result" class="result-message"></p>
-        <p id="example" class="example-text"></p>
-      </div>
-      <button id="next" class="btn next-btn" style="display: none;">次の問題へ</button>
+      <h2 class="word-en">${q.en}</h2>
+      <div class="answer-section">
+        <input id="answer" placeholder="答えは？" class="input-text" />
+        <button id="check" class="btn primary-btn">答え合わせ</button>
+      </div>
+      <div id="result-area" class="result-area">
+        <p id="result" class="result-message"></p>
+        <p id="example" class="example-text"></p>
+        <button id="readExample" class="btn secondary-btn read-btn" style="display: none;">🔊 例文を聞く</button>
+      </div>
+      <button id="next" class="btn next-btn" style="display: none;">次の問題へ</button>
     </div>
   `;
 
-  // 答え合わせロジックの変更
+  // 答え合わせロジック
   $("#check").onclick = () => {
     const ans = $("#answer").value.trim().toLowerCase();
-    const ok = q.ja.toLowerCase().split(',').map(j => j.trim()).includes(ans);
+    // 複数の正解に対応（カンマ区切りでチェック）
+    const ok = q.ja.toLowerCase().split(',').map(j => j.trim()).includes(ans);
     const resultText = ok ? "✅ 正解！" : `❌ 不正解。正解は「${q.ja}」です。`;
     
     $("#result").textContent = resultText;
     $("#result").classList.add(ok ? 'correct' : 'incorrect');
+    $("#result").classList.remove(ok ? 'incorrect' : 'correct'); // クラス切り替え
 
-    // 例文を表示
-    $("#example").textContent = `例文: ${q.example || '例文が登録されていません。'}`;
+    // 例文の表示と自動読み上げ
+    const exampleText = q.example || '例文が登録されていません。';
+    $("#example").textContent = `例文: ${exampleText}`;
     
-    // 答え合わせボタンを非表示にし、次の問題へボタンを表示
+    // UIの切り替え
     $("#check").style.display = 'none';
     $("#next").style.display = 'block';
+
+    if (q.example) {
+        $("#readExample").style.display = 'inline-block';
+        speak(q.example); // ★ 自動で読み上げる ★
+    }
   };
+  
+  // 読み上げボタンのイベント設定
+  $("#readExample").onclick = () => {
+      // 例文がまだ表示されていない場合の対策も兼ねて、ここでテキストを取得
+      if (q.example) {
+          speak(q.example);
+      }
+  };
   
   $("#next").onclick = renderLearn;
   
   // Enterキーで答え合わせができるように
   $("#answer").addEventListener('keypress', (e) => {
       if (e.key === 'Enter') {
-          $("#check").click();
+          // 答え合わせボタンが非表示でなければクリック
+          if ($("#check").style.display !== 'none') {
+             $("#check").click();
+          }
       }
   });
 }
@@ -91,7 +124,6 @@ function renderAdd() {
     </div>
   `;
   
-  // 例文入力フィールドを追加
   $("#add").onclick = () => {
     const en = $("#en").value.trim();
     const ja = $("#ja").value.trim();
